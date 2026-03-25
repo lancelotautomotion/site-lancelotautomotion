@@ -53,27 +53,23 @@ html,body{
   #app-panel{box-shadow:0 0 0 1px var(--border),0 32px 80px rgba(0,0,0,.5);height:100%}
 }
 @media(min-width:900px){
-  #app-panel{border-radius:16px;height:calc(100vh - 48px);max-height:860px}
+  #app-panel{border-radius:16px;height:calc(100vh - 48px)}
 }
 /* ── DESKTOP 2-COL ── */
 @media(min-width:1000px){
   #app-shell{padding:24px;background:var(--surface)}
   #app-panel{
-    max-width:1100px;width:100%;
-    border-radius:14px;height:calc(100vh - 48px);max-height:920px;
-    /* Flexbox horizontal : colonne gauche fixe + colonne droite flex */
+    max-width:1440px;width:100%;
+    border-radius:14px;height:calc(100vh - 48px);
     display:flex;flex-direction:row;
     overflow:hidden;position:relative;
   }
-
-  /* Tous les screens restent en position:absolute sur mobile.
-     En desktop on les sort du flux et on les positionne manuellement via JS display. */
 
   /* Colonne gauche : shootings — toujours visible, largeur fixe */
   #screen-shootings{
     position:relative!important;inset:auto!important;
     opacity:1!important;pointer-events:all!important;
-    width:300px;flex-shrink:0;height:100%;
+    width:340px;flex-shrink:0;height:100%;
     border-right:1px solid var(--border);
     border-radius:14px 0 0 14px;
     display:flex!important;flex-direction:column;overflow:hidden;
@@ -87,7 +83,7 @@ html,body{
   }
   #screen-login.active{display:flex!important}
 
-  /* Colonne droite : brands et brand — occupent le reste */
+  /* Colonne droite */
   #screen-brands,#screen-brand{
     position:relative!important;inset:auto!important;
     opacity:1!important;pointer-events:all!important;
@@ -97,35 +93,59 @@ html,body{
   }
   #screen-brands.active,#screen-brand.active{display:flex!important}
 
-  /* Welcome placeholder dans la colonne droite */
+  /* Welcome placeholder */
   #desktop-right-welcome{
     flex:1;height:100%;
     display:flex;align-items:center;justify-content:center;
-    flex-direction:column;gap:12px;
+    flex-direction:column;gap:16px;
     border-radius:0 14px 14px 0;
     background:var(--bg);
   }
   #desktop-right-welcome.hidden{display:none}
-  .drw-line{width:28px;height:1px;background:var(--border-lt)}
-  .drw-text{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+  .drw-line{width:32px;height:1px;background:var(--border-lt)}
+  .drw-text{font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:var(--muted)}
   .shooting-card.desktop-selected{border-color:var(--gold-dim);background:var(--surface)}
 
   #btn-back-brands{display:none}
 
   /* Sheets : modals centrés en fixed */
   .sheet-overlay{position:fixed;inset:0;border-radius:0}
-  .sheet{position:fixed;left:50%;right:auto;width:460px;bottom:auto;top:50%;border-radius:14px;
-         transform:translate(-50%,-50%) scale(.97);max-height:85vh;overflow-y:auto;border:1px solid var(--border)}
+  .sheet{position:fixed;left:50%;right:auto;width:480px;bottom:auto;top:50%;border-radius:14px;
+         transform:translate(-50%,-50%) scale(.97);max-height:88vh;overflow-y:auto;border:1px solid var(--border)}
   .sheet::-webkit-scrollbar{display:none}
   .sheet.open{transform:translate(-50%,-50%) scale(1)}
   .sheet-handle{display:none}
 
-  /* Bouton supprimer shooting desktop */
+  /* Shooting card : cacher chevron et hint swipe sur desktop */
+  .swipe-hint{display:none!important}
+  .shooting-card>.shooting-chevron{display:none}
+
+  /* Shooting del button */
   .shooting-del-desktop{display:flex}
+  /* Hover state for desktop shooting cards */
+  .shooting-card:hover{background:var(--surface);border-color:var(--border-lt)}
+  .shooting-card.desktop-selected:hover{border-color:var(--gold-dim)}
+
+  /* Brand card delete : invisible par défaut, apparaît au hover de la card */
+  .brand-del-btn{opacity:0;transition:opacity .15s,border-color .15s,color .15s}
+  .brand-card:hover .brand-del-btn{opacity:1}
+
+  /* Section header spacing desktop */
+  .section-header{padding:20px 22px 12px}
+  #screen-shootings .shooting-wrap{margin:0 14px 6px}
+  #screen-brands .section-header{padding:18px 22px 10px}
+  #screen-brands .brand-card{margin:0 14px 6px}
+  .filter-bar{padding:10px 14px}
+
+  /* FAB légèrement plus discret sur desktop */
+  .fab{width:46px;height:46px;bottom:22px;right:18px}
 
   /* Photos desktop */
   .photo-thumb{max-width:180px}
   .photo-grid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr))}
+
+  /* Topbar desktop */
+  .topbar{padding:16px 22px}
 }
 
 /* ── SCREENS ── */
@@ -177,10 +197,11 @@ iframe[src*="accounts.google.com"]{pointer-events:none!important}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
 
 /* ── SHOOTING CARDS ── */
-.swipe-hint{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);padding:0 18px 10px;display:none}
+.swipe-hint{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);padding:0 18px 8px;display:none}
 /* Bouton supprimer desktop (caché sur mobile) */
-.shooting-del-desktop{display:none;width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:transparent;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);flex-shrink:0;transition:border-color .15s,color .15s;-webkit-tap-highlight-color:transparent}
+.shooting-del-desktop{display:none;width:26px;height:26px;border-radius:50%;border:1px solid var(--border);background:transparent;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);flex-shrink:0;transition:border-color .15s,color .15s,opacity .15s;-webkit-tap-highlight-color:transparent;opacity:0}
 .shooting-del-desktop:hover{border-color:var(--red);color:var(--red)}
+.shooting-wrap:hover .shooting-del-desktop{opacity:1}
 .shooting-wrap{position:relative;margin:0 18px 8px;border-radius:10px;overflow:hidden}
 .shooting-del-bg{position:absolute;inset:0;background:var(--red-bg);border:1px solid var(--red);border-radius:10px;display:flex;align-items:center;justify-content:flex-end;padding-right:18px;gap:6px}
 .shooting-del-label{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--red)}
@@ -195,15 +216,18 @@ iframe[src*="accounts.google.com"]{pointer-events:none!important}
 .filter-bar{display:flex;gap:6px;padding:10px 18px;background:var(--bg);border-bottom:1px solid var(--border);overflow-x:auto;flex-shrink:0;transition:background .3s}
 .filter-bar::-webkit-scrollbar{display:none}
 .filter-pill{padding:5px 13px;border-radius:20px;font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;white-space:nowrap;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all .15s;-webkit-tap-highlight-color:transparent}
+.filter-pill:hover:not(.active){border-color:var(--border-lt);color:var(--text-2)}
 .filter-pill.active{background:var(--gold);border-color:var(--gold);color:#0a0a0a}
 
 /* ── BRAND CARDS ── */
-.brand-card{background:var(--card);border:1px solid var(--border);border-radius:10px;margin:0 18px 8px;overflow:hidden;cursor:pointer;transition:border-color .15s,background .3s;-webkit-tap-highlight-color:transparent;position:relative}
+.brand-card{background:var(--card);border:1px solid var(--border);border-radius:10px;margin:0 18px 8px;overflow:hidden;cursor:pointer;transition:border-color .15s,background .15s;-webkit-tap-highlight-color:transparent;position:relative}
+.brand-card:hover{background:var(--surface);border-color:var(--border-lt)}
 .brand-card:active{border-color:var(--gold-dim)}
-.brand-card-header{padding:13px 16px;display:flex;align-items:center;gap:10px}
+.brand-card-header{padding:14px 16px;display:flex;align-items:center;gap:10px}
 .brand-name{flex:1;font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:400;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.brand-tags{display:flex;align-items:center;gap:6px;flex-shrink:0}
-.brand-del-btn{width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);flex-shrink:0;transition:border-color .15s,color .15s;-webkit-tap-highlight-color:transparent}
+.brand-tags{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.brand-del-btn{width:26px;height:26px;border-radius:50%;border:1px solid var(--border);background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);flex-shrink:0;transition:border-color .15s,color .15s,opacity .15s;-webkit-tap-highlight-color:transparent}
+.brand-del-btn:hover{border-color:var(--red);color:var(--red)}
 .brand-del-btn:active{border-color:var(--red);color:var(--red)}
 .tag{padding:2px 9px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
 .tag-coursier{background:var(--green-bg);color:var(--green)}.tag-drop{background:var(--purple-bg);color:var(--purple)}.tag-recv{background:var(--green-bg);color:var(--green)}.tag-wait{background:var(--red-bg);color:var(--red)}
@@ -286,6 +310,7 @@ iframe[src*="accounts.google.com"]{pointer-events:none!important}
 /* ── EMPTY STATE ── */
 .empty-state{text-align:center;padding:64px 20px;color:var(--muted)}
 .empty-state-line{width:32px;height:1px;background:var(--border-lt);margin:0 auto 20px}
+.empty-state-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:300;color:var(--text-2);margin-bottom:8px}
 .empty-state-text{font-size:13px;line-height:1.75}
 
 /* ── TOAST ── */
@@ -296,6 +321,7 @@ iframe[src*="accounts.google.com"]{pointer-events:none!important}
 
 /* ── LOADER ── */
 .loader-overlay{position:absolute;inset:0;background:rgba(7,7,7,.82);z-index:150;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;opacity:0;pointer-events:none;transition:opacity .2s}
+[data-theme="light"] .loader-overlay{background:rgba(244,240,234,.9)}
 .loader-overlay.show{opacity:1;pointer-events:all}
 .spinner{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border);border-top-color:var(--gold);animation:spin .65s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -537,6 +563,7 @@ iframe[src*="accounts.google.com"]{pointer-events:none!important}
 <div id="desktop-right-welcome">
   <div class="drw-line"></div>
   <div class="drw-text">Sélectionnez un shooting</div>
+  <div class="drw-line"></div>
 </div>
 </div>
 </div>
@@ -818,13 +845,13 @@ async function deletePhoto(type,idx){
 /* RENDER SHOOTINGS */
 function renderShootings(){
   const list=document.getElementById('shootings-list'),count=document.getElementById('shootings-count'),hint=document.getElementById('swipe-hint');
-  const n=db.shootings.length;count.textContent=n+' shooting'+(n>1?'s':'');hint.style.display=n>0?'block':'none';
-  if(!n){list.innerHTML=`<div class="empty-state"><div class="empty-state-line"></div><div class="empty-state-text">Aucun shooting pour l'instant.<br>Appuyez sur + pour commencer.</div></div>`;return;}
+  const n=db.shootings.length;count.textContent=n+' shooting'+(n>1?'s':'');hint.style.display=(n>0&&!isDesktop())?'block':'none';
+  if(!n){list.innerHTML=`<div class="empty-state"><div class="empty-state-line"></div><div class="empty-state-title">Aucun shooting</div><div class="empty-state-text">Appuyez sur + pour créer<br>votre premier shooting.</div></div>`;return;}
   list.innerHTML=db.shootings.map(s=>{
     const bc=s.brands.length,parts=[];
     if(s.date) parts.push(fmtDate(s.date));else parts.push(new Date(s.createdAt).toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'}));
     if(s.notes) parts.push(esc(s.notes));
-    return`<div class="shooting-wrap" data-id="${s.id}"><div class="shooting-del-bg"><span class="shooting-del-label">Supprimer</span><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 4h10M6 4V3h4v1M5 4l.5 9h5l.5-9" stroke="var(--red)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="shooting-card" data-id="${s.id}"><div class="shooting-card-info"><div class="shooting-card-name">${esc(s.name)}</div><div class="shooting-card-meta">${bc} marque${bc!==1?'s':''}&nbsp;·&nbsp;${parts.join('&nbsp;·&nbsp;')}</div></div><button class="shooting-del-desktop" data-del-id="${s.id}" title="Supprimer"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 3h6M4 3V2h2v1M3 3l.4 6h3.2L7 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="color:var(--muted2);flex-shrink:0"><polyline points="5,2 9,7 5,12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>`;
+    return`<div class="shooting-wrap" data-id="${s.id}"><div class="shooting-del-bg"><span class="shooting-del-label">Supprimer</span><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 4h10M6 4V3h4v1M5 4l.5 9h5l.5-9" stroke="var(--red)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="shooting-card" data-id="${s.id}"><div class="shooting-card-info"><div class="shooting-card-name">${esc(s.name)}</div><div class="shooting-card-meta">${bc} marque${bc!==1?'s':''}&nbsp;·&nbsp;${parts.join('&nbsp;·&nbsp;')}</div></div><button class="shooting-del-desktop" data-del-id="${s.id}" title="Supprimer"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 3h6M4 3V2h2v1M3 3l.4 6h3.2L7 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><svg class="shooting-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none" style="color:var(--muted2);flex-shrink:0"><polyline points="5,2 9,7 5,12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>`;
   }).join('');
   list.querySelectorAll('.shooting-wrap').forEach(wrap=>{
     const card=wrap.querySelector('.shooting-card'),id=wrap.dataset.id;
@@ -874,7 +901,7 @@ function renderBrands(){
   else if(activeFilter==='pending') brands=brands.filter(b=>!b.packageReceived);
   document.getElementById('brands-count').textContent=brands.length+' marque'+(brands.length!==1?'s':'');
   const list=document.getElementById('brands-list');
-  if(!brands.length){list.innerHTML=`<div class="empty-state"><div class="empty-state-line"></div><div class="empty-state-text">Aucune marque${activeFilter!=='all'?' pour ce filtre':''}.<br>${activeFilter==='all'?'Appuyez sur + pour en ajouter.':''}</div></div>`;return;}
+  if(!brands.length){list.innerHTML=`<div class="empty-state"><div class="empty-state-line"></div><div class="empty-state-title">${activeFilter!=='all'?'Aucun résultat':'Aucune marque'}</div><div class="empty-state-text">${activeFilter!=='all'?'Aucune marque pour ce filtre.':'Appuyez sur + pour ajouter<br>une marque à ce shooting.'}</div></div>`;return;}
   list.innerHTML=brands.map(b=>{
     const ci=(b.checkInPhotos||[]).length,co=(b.checkOutPhotos||[]).length;
     const rtTag=b.returnType==='coursier'?`<span class="tag tag-coursier">Coursier</span>`:`<span class="tag tag-drop">Drop</span>`;
