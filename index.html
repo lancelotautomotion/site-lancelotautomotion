@@ -117,12 +117,19 @@
     #hero { min-height: 100vh; display: flex; align-items: center; padding: 160px 64px 100px; overflow: hidden; }
     #hero::before { content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none; background: radial-gradient(ellipse 70% 60% at 70% 50%, rgba(255,255,255,.025) 0%, transparent 70%); }
     body.light #hero::before { background: radial-gradient(ellipse 70% 60% at 70% 50%, rgba(0,0,0,.03) 0%, transparent 70%); }
-    .hero-grid { width: 100%; max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: 1.1fr 1fr; gap: 80px; align-items: center; position: relative; z-index: 1; }
-    .hero-eyebrow { display: inline-flex; align-items: center; gap: 12px; font-size: .72rem; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); margin-bottom: 32px; animation: fadeUp .8s ease both; }
+    #hero-wave { position: absolute; inset: 0; z-index: 0; }
+    #hero-overlay { position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(108deg, rgba(8,8,8,.84) 0%, rgba(8,8,8,.5) 42%, rgba(8,8,8,.12) 64%, transparent 80%); }
+    body.light #hero-overlay { background: linear-gradient(108deg, rgba(247,244,239,.9) 0%, rgba(247,244,239,.58) 42%, rgba(247,244,239,.14) 64%, transparent 80%); }
+    @media (max-width: 1024px) { #hero-overlay { background: rgba(8,8,8,.72); } body.light #hero-overlay { background: rgba(247,244,239,.84); } }
+    .hero-grid { width: 100%; max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: 1.1fr 1fr; gap: 80px; align-items: center; position: relative; z-index: 2; }
+    .hero-eyebrow { display: inline-flex; align-items: center; gap: 12px; font-size: .72rem; letter-spacing: .22em; text-transform: uppercase; color: #919191; margin-bottom: 32px; animation: fadeUp .8s ease both; }
+    body.light .hero-eyebrow { color: var(--muted); }
     .hero-eyebrow::before { content: ''; display: block; width: 28px; height: 1px; background: var(--muted2); }
-    .hero-title { font-family: var(--serif); font-size: clamp(3.2rem, 5.8vw, 5.6rem); font-weight: 300; line-height: 1.04; letter-spacing: -.025em; margin-bottom: 28px; animation: fadeUp .8s .12s ease both; }
+    .hero-title { font-family: var(--serif); font-size: clamp(3.2rem, 5.8vw, 5.6rem); font-weight: 300; line-height: 1.04; letter-spacing: -.025em; margin-bottom: 28px; animation: fadeUp .8s .12s ease both; text-shadow: 0 2px 28px rgba(0,0,0,.4); }
+    body.light .hero-title { text-shadow: none; }
     .hero-title .outline { color: transparent; -webkit-text-stroke: 1px var(--stroke); font-style: italic; }
-    .hero-sub { font-size: .98rem; color: var(--muted); max-width: 400px; margin-bottom: 52px; line-height: 1.85; animation: fadeUp .8s .24s ease both; }
+    .hero-sub { font-size: .98rem; color: #aaaaaa; max-width: 400px; margin-bottom: 52px; line-height: 1.85; animation: fadeUp .8s .24s ease both; }
+    body.light .hero-sub { color: var(--muted); }
     .hero-actions { display: flex; gap: 16px; align-items: center; animation: fadeUp .8s .36s ease both; }
     .btn-primary { display: inline-flex; align-items: center; gap: 12px; background: var(--btn-bg); color: var(--btn-fg); font-family: var(--sans); font-size: .78rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; padding: 17px 36px; text-decoration: none; border: none; transition: opacity .2s, transform .25s, background .3s, color .3s; }
     .btn-primary:hover { opacity: .85; transform: translateY(-2px); }
@@ -140,7 +147,7 @@
     .hv-logo-cell img { width: 58%; height: auto; object-fit: contain; opacity: .88; transition: opacity .3s; }
     .hv-cell.hv-logo-cell:hover img { opacity: 1; }
     body.light .hv-logo-cell img { filter: invert(1); }
-    .hero-scroll { position: absolute; bottom: 44px; left: 64px; display: flex; align-items: center; gap: 12px; font-size: .7rem; letter-spacing: .18em; text-transform: uppercase; color: var(--muted2); animation: fadeIn 1.5s 1s ease both; }
+    .hero-scroll { position: absolute; bottom: 44px; left: 64px; z-index: 2; display: flex; align-items: center; gap: 12px; font-size: .7rem; letter-spacing: .18em; text-transform: uppercase; color: var(--muted2); animation: fadeIn 1.5s 1s ease both; }
     .scroll-line { width: 40px; height: 1px; background: linear-gradient(to right, var(--muted2), transparent); }
     /* ── COMMONS ── */
     .section-tag { font-size: .72rem; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
@@ -446,6 +453,8 @@
 </div>
 <!-- HERO -->
 <section id="hero">
+  <div id="hero-wave" aria-hidden="true"></div>
+  <div id="hero-overlay" aria-hidden="true"></div>
   <div class="hero-grid">
     <div>
       <div class="hero-eyebrow">Consultant Digital Indépendant</div>
@@ -735,5 +744,144 @@
   }
 </script>
 <button class="scroll-top" id="scrollTop" aria-label="Retour en haut de page">&#8593;</button>
+<script type="module">
+import { createNoise2D } from 'https://esm.sh/simplex-noise@4.0.1';
+(function () {
+  var container = document.getElementById('hero-wave');
+  if (!container) return;
+
+  function getColors() {
+    var light = document.body.classList.contains('light');
+    return {
+      stroke: light ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.22)',
+      bg: light ? '#f7f4ef' : '#0c0c0c'
+    };
+  }
+
+  var mouse = { x: -10, y: 0, lx: 0, ly: 0, sx: 0, sy: 0, v: 0, vs: 0, a: 0, set: false };
+  var paths = [], lines = [];
+  var noise = createNoise2D();
+  var raf = null, bounding = null;
+
+  var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.style.cssText = 'display:block;width:100%;height:100%;';
+  container.appendChild(svg);
+
+  var dot = document.createElement('div');
+  dot.style.cssText = 'position:absolute;top:0;left:0;width:.5rem;height:.5rem;border-radius:50%;transform:translate3d(calc(var(--wx) - 50%),calc(var(--wy) - 50%),0);will-change:transform;pointer-events:none;';
+  container.appendChild(dot);
+
+  function updateColors() {
+    var c = getColors();
+    container.style.backgroundColor = c.bg;
+    dot.style.background = c.stroke;
+    for (var i = 0; i < paths.length; i++) paths[i].setAttribute('stroke', c.stroke);
+  }
+
+  function setSize() {
+    bounding = container.getBoundingClientRect();
+    svg.style.width = bounding.width + 'px';
+    svg.style.height = bounding.height + 'px';
+  }
+
+  function setLines() {
+    if (!bounding) return;
+    var w = bounding.width, h = bounding.height;
+    lines = [];
+    for (var i = 0; i < paths.length; i++) paths[i].remove();
+    paths = [];
+    var c = getColors();
+    var xGap = 8, yGap = 8;
+    var totalLines = Math.ceil((w + 200) / xGap);
+    var totalPoints = Math.ceil((h + 30) / yGap);
+    var xStart = (w - xGap * totalLines) / 2;
+    var yStart = (h - yGap * totalPoints) / 2;
+    for (var i = 0; i < totalLines; i++) {
+      var pts = [];
+      for (var j = 0; j < totalPoints; j++) {
+        pts.push({ x: xStart + xGap * i, y: yStart + yGap * j, wave: { x: 0, y: 0 }, cursor: { x: 0, y: 0, vx: 0, vy: 0 } });
+      }
+      var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('fill', 'none');
+      path.setAttribute('stroke', c.stroke);
+      path.setAttribute('stroke-width', '1');
+      svg.appendChild(path);
+      paths.push(path);
+      lines.push(pts);
+    }
+  }
+
+  function updateMousePos(x, y) {
+    if (!bounding) return;
+    mouse.x = x - bounding.left;
+    mouse.y = y - bounding.top + window.scrollY;
+    if (!mouse.set) { mouse.sx = mouse.x; mouse.sy = mouse.y; mouse.lx = mouse.x; mouse.ly = mouse.y; mouse.set = true; }
+    container.style.setProperty('--wx', mouse.sx + 'px');
+    container.style.setProperty('--wy', mouse.sy + 'px');
+  }
+
+  function movePoints(time) {
+    for (var li = 0; li < lines.length; li++) {
+      var pts = lines[li];
+      for (var pi = 0; pi < pts.length; pi++) {
+        var p = pts[pi];
+        var move = noise((p.x + time * 0.008) * 0.003, (p.y + time * 0.003) * 0.002) * 8;
+        p.wave.x = Math.cos(move) * 12;
+        p.wave.y = Math.sin(move) * 6;
+        var dx = p.x - mouse.sx, dy = p.y - mouse.sy;
+        var d = Math.hypot(dx, dy), l = Math.max(175, mouse.vs);
+        if (d < l) {
+          var s = 1 - d / l, f = Math.cos(d * 0.001) * s;
+          p.cursor.vx += Math.cos(mouse.a) * f * l * mouse.vs * 0.00035;
+          p.cursor.vy += Math.sin(mouse.a) * f * l * mouse.vs * 0.00035;
+        }
+        p.cursor.vx += (0 - p.cursor.x) * 0.01; p.cursor.vy += (0 - p.cursor.y) * 0.01;
+        p.cursor.vx *= 0.95; p.cursor.vy *= 0.95;
+        p.cursor.x = Math.min(50, Math.max(-50, p.cursor.x + p.cursor.vx));
+        p.cursor.y = Math.min(50, Math.max(-50, p.cursor.y + p.cursor.vy));
+      }
+    }
+  }
+
+  function moved(p, cur) {
+    return { x: p.x + p.wave.x + (cur !== false ? p.cursor.x : 0), y: p.y + p.wave.y + (cur !== false ? p.cursor.y : 0) };
+  }
+
+  function drawLines() {
+    for (var li = 0; li < lines.length; li++) {
+      var pts = lines[li];
+      if (pts.length < 2 || !paths[li]) continue;
+      var f = moved(pts[0], false);
+      var d = 'M ' + f.x + ' ' + f.y;
+      for (var pi = 1; pi < pts.length; pi++) { var m = moved(pts[pi]); d += ' L ' + m.x + ' ' + m.y; }
+      paths[li].setAttribute('d', d);
+    }
+  }
+
+  function tick(time) {
+    mouse.sx += (mouse.x - mouse.sx) * 0.1;
+    mouse.sy += (mouse.y - mouse.sy) * 0.1;
+    var dx = mouse.x - mouse.lx, dy = mouse.y - mouse.ly, d = Math.hypot(dx, dy);
+    mouse.v = d; mouse.vs += (d - mouse.vs) * 0.1; mouse.vs = Math.min(100, mouse.vs);
+    mouse.lx = mouse.x; mouse.ly = mouse.y; mouse.a = Math.atan2(dy, dx);
+    container.style.setProperty('--wx', mouse.sx + 'px');
+    container.style.setProperty('--wy', mouse.sy + 'px');
+    movePoints(time); drawLines();
+    raf = requestAnimationFrame(tick);
+  }
+
+  setSize(); setLines(); updateColors();
+  raf = requestAnimationFrame(tick);
+
+  window.addEventListener('resize', function () { setSize(); setLines(); updateColors(); });
+  window.addEventListener('mousemove', function (e) { updateMousePos(e.pageX, e.pageY); });
+  window.addEventListener('touchmove', function (e) {
+    updateMousePos(e.touches[0].clientX, e.touches[0].clientY);
+  }, { passive: true });
+
+  new MutationObserver(function () { updateColors(); })
+    .observe(document.body, { attributes: true, attributeFilter: ['class'] });
+})();
+</script>
 </body>
 </html>
